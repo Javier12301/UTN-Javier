@@ -95,8 +95,6 @@ elif len(cp) == 6 and cp[:5].isdigit():
   
 elif len(cp) == 5 and cp[:4].isdigit():
   destino = "Uruguay"
-  provincia = "No aplica"
-  
 else:
   destino = "Otro"
   provincia = "No aplica"
@@ -104,6 +102,8 @@ else:
 # Código de tipo de envio
 #[0, 6]
 if(tipo >= 0 and tipo <= 6):
+  provincia = "No aplica"
+
     if(tipo == 0):
         inicial = 1100  
     elif(tipo == 1):
