@@ -135,7 +135,7 @@ elif destino == "Chile":
     inicial = int(inicial * 1.25)
 elif destino == "Brasil":
     # if del 0 al 3 +%25
-    if cp[0] == "O" or cp[0] == "1" or cp[0] == "2" or cp[0] == "3":
+    if cp[0] == "0" or cp[0] == "1" or cp[0] == "2" or cp[0] == "3":
         inicial = int(inicial * 1.25)
     elif cp[0] == "4" or cp[0] == "5" or cp[0] == "6" or cp[0] == "7":
         # if del 4 al 7 +%30

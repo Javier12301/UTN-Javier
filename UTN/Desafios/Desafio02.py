@@ -3,9 +3,6 @@
     f(n) = n/2 , SI n es par
     f(n) = 3n + 1, SI n es impar
 """
-import os
-
-
 def sum_collatz(n):
     sucesion = [n]
     while n != 1:
@@ -30,8 +27,6 @@ def resultados(sucesion, long_orbita, prom_orbita, mayor_orbita):
     print(f"Promedio de todos los valores de la órbita: {prom_orbita}")
     # Mayor
     print(f"Mayor de los números en la órbita: {mayor_orbita}")
-def clear_terminal():
-    print("\033[H\033[2J")
 
 while True:
     n = int(input("Ingrese el valor n: "))

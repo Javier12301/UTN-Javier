@@ -1,4 +1,3 @@
-# Variables por ahora
 control = ""
 cedvalid = 0
 cedinvalid = 0
@@ -17,10 +16,8 @@ final_buenos_aires = 0
 cont_buenos_aires = 0
 
 # Funciones
-def identificar_control(contenido):
-    # leer primera linea
-    linea_timestamp = contenido.split("\n")[0]
-    if "hc" in linea_timestamp.lower():
+def identificar_control(linea):
+    if "hc" in linea.lower():
         return "Hard Control"
     else:
         return "Soft Control"
@@ -29,7 +26,7 @@ def obtener_cp(linea):
     cp = linea[0:9].strip()
     return cp
 def obtener_provincia(cp):
-    if len(cp) == 8 and cp[0].isalpha and cp[0] != "O" and cp[0] != "I" and cp[1:4].isdigit() and [cp[5:].isalpha]:
+    if len(cp) == 8 and cp[0].isalpha() and cp[0] != "O" and cp[0] != "I" and cp[1:4].isdigit() and [cp[5:].isalpha()]:
         # Detección provincias
         destino = "Argentina"
         if (cp[0] == "C"):
@@ -84,17 +81,17 @@ def obtener_provincia(cp):
             provincia = "No aplica"
         return provincia
 def identificar_destino(cp):
-    if len(cp) == 8 and cp[0].isalpha and cp[0] != "O" and cp[0] != "I" and cp[1:4].isdigit() and [cp[5:].isalpha]:
+    if len(cp) == 8 and cp[0].isalpha() and cp[0] != "O" and cp[0] != "I" and cp[1:4].isdigit() and cp[5:].isalpha():
         destino = "Argentina"
-    elif len(cp) == 4 and cp[:3].isdigit():
+    elif len(cp) == 4 and cp.isdigit():
         destino = "Bolivia"
-    elif len(cp) == 9 and cp[:4].isdigit() and cp[5] == "-" and cp[6:8].isdigit():
+    elif len(cp) == 9 and cp[:5].isdigit() and cp[5] == "-" and cp[6:8].isdigit() and cp[8:].isdigit():
         destino = "Brasil"
-    elif len(cp) == 7 and cp[:6].isdigit():
+    elif len(cp) == 7 and cp.isdigit():
         destino = "Chile"
-    elif len(cp) == 6 and cp[:5].isdigit():
+    elif len(cp) == 6 and cp.isdigit():
         destino = "Paraguay"
-    elif len(cp) == 5 and cp[:4].isdigit():
+    elif len(cp) == 5 and cp.isdigit():
         destino = "Uruguay"
     else:
         destino = "Otro"
@@ -112,23 +109,39 @@ def identificar_tipo_pago(linea):
     tipo_pago = linea[30]
     return int(tipo_pago)
 
-def validar_direccion(direccion):
-    # Separar en palabras
-    palabras = direccion.split()
-    for palabra in palabras:
-        if not (palabra.isalpha() or palabra.isdigit()):
-            return False
+def extraer_palabras(direccion):
+    palabras = ()
+    palabra_actual = ""
 
-    # Verificar si existe dos mayúsculas seguidas
+    for char in direccion:
+        if char == ' ':
+            if palabra_actual:
+                palabras += (palabra_actual,)
+                palabra_actual = ""
+        else:
+            palabra_actual += char
+
+    if palabra_actual:
+        palabras += (palabra_actual,)
+
+    return palabras
+
+
+def validar_direccion(direccion):
+    palabras = extraer_palabras(direccion)
+    hay_palabra_digitos = False
+
     for i in range(len(direccion) - 1):
         if direccion[i].isupper() and direccion[i + 1].isupper():
             return False
 
-    # Verificar si hay al menos una palabra compuesta solo por digitos
     for palabra in palabras:
+        if not (palabra.isalpha() or palabra.isdigit()):
+            return False
         if palabra.isdigit():
-            return True
-    return False
+            hay_palabra_digitos = True
+
+    return hay_palabra_digitos
 
 def configurar_tipo_envio(tipo):
     inicial = 0
@@ -200,29 +213,30 @@ def obtener_tipo_carta_mayor_envios():
 
 # Entrada de datos
 # archivo = open("envios.txt", "r")
-with open("envios.txt", "r", encoding="utf-8") as archivo:
+with open("envios500b.txt", "r", encoding="utf-8") as archivo:
     cont_total_envios_ext = 0
     cont_total_envios = 0
-    contenido = archivo.read()
-    # Identificar timestamp
-    control = identificar_control(contenido)
-    # Identificar código postal
-    # Separamos primero las filas, no tomamos la primera ni la ultima ya que la primera
-    # es el Timestamp y la última un salto de linea que se produce de manera automatica
-    lineas = contenido.split("\n")[1:-1]
-    for i in range(0, len(lineas)):
+    flag_control = False
+    flag_primer_cp = False
+    for linea in archivo:
+        linea = linea.replace("\n","")
+        if not flag_control:
+            control = identificar_control(linea)
+            flag_control = True
+            flag_primer_cp = True
+            continue
         inicial = 0
         final = 0
-        cp = obtener_cp(lineas[i])
+        cp = obtener_cp(linea)
         provincia = obtener_provincia(cp)
         destino = identificar_destino(cp)
-        direccion = identificar_direccion(lineas[i])
-        tipo_envio = identificar_tipo_envio(lineas[i])
-        tipo_pago = identificar_tipo_pago(lineas[i])
-
-        # R9 Y R10
-        if i == 0:
+        direccion = identificar_direccion(linea)
+        tipo_envio = identificar_tipo_envio(linea)
+        tipo_pago = identificar_tipo_pago(linea)
+        # R1, R9 Y R10
+        if flag_primer_cp:
             primer_cp = cp
+            flag_primer_cp = False
         if cp == primer_cp:
             cant_primer_cp += 1
         # Según tipo de control, verificar o no dirección

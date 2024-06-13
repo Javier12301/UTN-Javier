@@ -84,17 +84,17 @@ def obtener_provincia(cp):
             provincia = "No aplica"
         return provincia
 def identificar_destino(cp):
-    if len(cp) == 8 and cp[0].isalpha and cp[0] != "O" and cp[0] != "I" and cp[1:4].isdigit() and [cp[5:].isalpha]:
+    if len(cp) == 8 and cp[0].isalpha() and cp[0] != "O" and cp[0] != "I" and cp[1:4].isdigit() and cp[5:].isalpha():
         destino = "Argentina"
-    elif len(cp) == 4 and cp[:3].isdigit():
+    elif len(cp) == 4 and cp.isdigit():
         destino = "Bolivia"
-    elif len(cp) == 9 and cp[:4].isdigit() and cp[5] == "-" and cp[6:8].isdigit():
+    elif len(cp) == 9 and cp[:5].isdigit() and cp[5] == "-" and cp[6:8].isdigit() and cp[8:].isdigit():
         destino = "Brasil"
-    elif len(cp) == 7 and cp[:6].isdigit():
+    elif len(cp) == 7 and cp.isdigit():
         destino = "Chile"
-    elif len(cp) == 6 and cp[:5].isdigit():
+    elif len(cp) == 6 and cp.isdigit():
         destino = "Paraguay"
-    elif len(cp) == 5 and cp[:4].isdigit():
+    elif len(cp) == 5 and cp.isdigit():
         destino = "Uruguay"
     else:
         destino = "Otro"
@@ -206,10 +206,9 @@ with open("envios500b.txt", "r", encoding="utf-8") as archivo:
     contenido = archivo.read()
     # Identificar timestamp
     control = identificar_control(contenido)
-    # Identificar código postal
-    # Separamos primero las filas, no tomamos la primera ni la ultima ya que la primera
-    # es el Timestamp y la última un salto de linea que se produce de manera automatica
-    lineas = contenido.split("\n")[1:-1]
+    lineas = contenido.split("\n")[1:]
+    if lineas[-1] == "":
+        lineas = lineas[:-1]
     for i in range(0, len(lineas)):
         inicial = 0
         final = 0
@@ -219,10 +218,6 @@ with open("envios500b.txt", "r", encoding="utf-8") as archivo:
         direccion = identificar_direccion(lineas[i])
         tipo_envio = identificar_tipo_envio(lineas[i])
         tipo_pago = identificar_tipo_pago(lineas[i])
-        if i == 500:
-            print(lineas[i])
-            input()
-
         # R9 Y R10
         if i == 0:
             primer_cp = cp

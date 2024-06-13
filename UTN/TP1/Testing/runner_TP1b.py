@@ -3,7 +3,7 @@ import sys
 import os
 
 # Directorio donde se almacenan los programas entregados por los estudiantes
-SOURCES = "./trab_c"
+SOURCES = "./trabajos"
 
 # Lotes de prueba contra los que serán corridos los programas de los estudiantes.
 # ("CP\nDirección\nTipo de envío\nForma de pago\n", Contexto, r1, r2, r3, r4)
