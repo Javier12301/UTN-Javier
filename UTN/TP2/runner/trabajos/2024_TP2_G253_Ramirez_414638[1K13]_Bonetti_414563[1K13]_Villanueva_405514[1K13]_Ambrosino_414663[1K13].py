@@ -1,20 +1,7 @@
-control = ""
-cedvalid = 0
-cedinvalid = 0
-imp_acu_total = 0
+# Acumuladores de tipo de envio
 ccs = 0
 ccc = 0
 cce = 0
-tipo_mayor = ""
-primer_cp = ""
-cant_primer_cp = 0
-menimp = None
-mencp = ""
-porc = 0
-prom = 0
-final_buenos_aires = 0
-cont_buenos_aires = 0
-
 # Funciones
 def identificar_control(linea):
     if "hc" in linea.lower():
@@ -29,54 +16,8 @@ def obtener_provincia(cp):
     if len(cp) == 8 and cp[0].isalpha() and cp[0] != "O" and cp[0] != "I" and cp[1:4].isdigit() and [cp[5:].isalpha()]:
         # Detección provincias
         destino = "Argentina"
-        if (cp[0] == "C"):
-            provincia = "Ciudad Autónoma de Buenos Aires"
-        elif (cp[0] == "B"):
+        if (cp[0] == "B"):
             provincia = "Buenos Aires"
-        elif (cp[0] == "K"):
-            provincia = "Catamarca"
-        elif (cp[0] == "H"):
-            provincia = "Chaco"
-        elif (cp[0] == "U"):
-            provincia = "Chubut"
-        elif (cp[0] == "X"):
-            provincia = "Córdoba"
-        elif (cp[0] == "W"):
-            provincia = "Corrientes"
-        elif (cp[0] == "E"):
-            provincia = "Entre Ríos"
-        elif (cp[0] == "P"):
-            provincia = "Formosa"
-        elif (cp[0] == "Y"):
-            provincia = "Jujuy"
-        elif (cp[0] == "L"):
-            provincia = "La Pampa"
-        elif (cp[0] == "F"):
-            provincia = "La Rioja"
-        elif (cp[0] == "M"):
-            provincia = "Mendoza"
-        elif (cp[0] == "N"):
-            provincia = "Misiones"
-        elif (cp[0] == "Q"):
-            provincia = "Neuquén"
-        elif (cp[0] == "R"):
-            provincia = "Rio Negro"
-        elif (cp[0] == "A"):
-            provincia = "Salta"
-        elif (cp[0] == "J"):
-            provincia = "San Juan"
-        elif (cp[0] == "D"):
-            provincia = "San Luis"
-        elif (cp[0] == "Z"):
-            provincia = "Santa Cruz"
-        elif (cp[0] == "S"):
-            provincia = "Santa Fe"
-        elif (cp[0] == "G"):
-            provincia = "Santiago del Estero"
-        elif (cp[0] == "V"):
-            provincia = "Tierra del Fuego"
-        elif (cp[0] == "T"):
-            provincia = "Tucumán"
         else:
             provincia = "No aplica"
         return provincia
@@ -114,6 +55,7 @@ def extraer_palabras(direccion):
     palabra_actual = ""
 
     for char in direccion:
+        # Detectar espacio, una palabras siempre termina despues del espacio
         if char == ' ':
             if palabra_actual:
                 palabras += (palabra_actual,)
@@ -126,16 +68,18 @@ def extraer_palabras(direccion):
 
     return palabras
 
-
+# Hipolito Yrigoyen 312
 def validar_direccion(direccion):
-    palabras = extraer_palabras(direccion)
+    # Almacenar palabras en tuplas, con el fin de poder recorrer y verificar si existen mayusculas
+    palabras_tupla = extraer_palabras(direccion)
     hay_palabra_digitos = False
 
     for i in range(len(direccion) - 1):
         if direccion[i].isupper() and direccion[i + 1].isupper():
             return False
-
-    for palabra in palabras:
+    # Recorrer la tupla de palabras y verificar si la palabra está compuesta de letras o digitos.
+    # O sea: Hertz 4236
+    for palabra in palabras_tupla:
         if not (palabra.isalpha() or palabra.isdigit()):
             return False
         if palabra.isdigit():
@@ -211,29 +155,59 @@ def obtener_tipo_carta_mayor_envios():
         mayor = "Carta Certificada"
     return mayor
 
-# Entrada de datos
-# archivo = open("envios.txt", "r")
-with open("envios500b.txt", "r", encoding="utf-8") as archivo:
+def calcular_porcentaje(cont_total_envios_ext, cont_total_envios):
+    return int((cont_total_envios_ext * 100) / cont_total_envios)
+
+def calcular_promedio(final_buenos_aires, cont_buenos_aires):
+    if cont_buenos_aires != 0:
+        prom = int(final_buenos_aires / cont_buenos_aires)
+    else:
+        prom = 0
+    return prom
+
+def leer_txt(archivo_txt):
+    archivo = open(archivo_txt, "r", encoding="utf-8")
+    return archivo
+
+def init():
+    archivo = leer_txt("envios.txt")
+    # Variables locales para manejo de funcionalidades
+    cedvalid = 0
+    cedinvalid = 0
+    imp_acu_total = 0
+    cant_primer_cp = 0
+    # Variable menor, se declara None para decir que no existe un menor todavía.
+    menimp = None
+    porc = 0
+    prom = 0
+    final_buenos_aires = 0
+    cont_buenos_aires = 0
     cont_total_envios_ext = 0
     cont_total_envios = 0
+    # Banderas
     flag_control = False
     flag_primer_cp = False
+    # Obtener arhivo txt, y leer linea por linea
     for linea in archivo:
-        linea = linea.replace("\n","")
+        # Iniciar variables para indicar precio inicial y final del envio.
+        inicial = 0
+        final = 0
+        # Limpiar el "enter" que genera la linea para la siguiente fila.
+        linea = linea.replace("\n", "")
+        # R1 identificar el Control del txt.
         if not flag_control:
             control = identificar_control(linea)
             flag_control = True
             flag_primer_cp = True
             continue
-        inicial = 0
-        final = 0
+        # Obtener datos de linea
         cp = obtener_cp(linea)
         provincia = obtener_provincia(cp)
         destino = identificar_destino(cp)
         direccion = identificar_direccion(linea)
         tipo_envio = identificar_tipo_envio(linea)
         tipo_pago = identificar_tipo_pago(linea)
-        # R1, R9 Y R10
+        #R9 Y R10
         if flag_primer_cp:
             primer_cp = cp
             flag_primer_cp = False
@@ -278,24 +252,27 @@ with open("envios500b.txt", "r", encoding="utf-8") as archivo:
                 menimp = final
                 mencp = cp
         # R13 Y 14
-        porc = int((cont_total_envios_ext * 100) / cont_total_envios)
-        if cont_buenos_aires != 0:
-            prom = int(final_buenos_aires / cont_buenos_aires)
-        else:
-            prom = 0
+        porc = calcular_porcentaje(cont_total_envios_ext, cont_total_envios)
+        prom = calcular_promedio(final_buenos_aires, cont_buenos_aires)
+    resultado(control, cedvalid, cedinvalid, imp_acu_total, ccs, ccc, cce, tipo_mayor, primer_cp, cant_primer_cp, menimp, mencp, porc, prom)
 
 # Salida
-print(' (r1) - Tipo de control de direcciones:', control)
-print(' (r2) - Cantidad de envios con direccion valida:', cedvalid)
-print(' (r3) - Cantidad de envios con direccion no valida:', cedinvalid)
-print(' (r4) - Total acumulado de importes finales:', imp_acu_total)
-print(' (r5) - Cantidad de cartas simples:', ccs)
-print(' (r6) - Cantidad de cartas certificadas:', ccc)
-print(' (r7) - Cantidad de cartas expresas:', cce)
-print(' (r8) - Tipo de carta con mayor cantidad de envios:', tipo_mayor)
-print(' (r9) - Codigo postal del primer envio del archivo:', primer_cp)
-print('(r10) - Cantidad de veces que entro ese primero:', cant_primer_cp)
-print('(r11) - Importe menor pagado por envios a Brasil:', menimp)
-print('(r12) - Codigo postal del envio a Brasil con importe menor:', mencp)
-print('(r13) - Porcentaje de envios al exterior sobre el total:', porc)
-print('(r14) - Importe final promedio de los envios Buenos Aires:', prom)
+def resultado(control, cedvalid, cedinvalid, imp_acu_total, ccs, ccc, cce, tipo_mayor, primer_cp, cant_primer_cp, menimp, mencp, porc, prom):
+    print(' (r1) - Tipo de control de direcciones:', control)
+    print(' (r2) - Cantidad de envios con direccion valida:', cedvalid)
+    print(' (r3) - Cantidad de envios con direccion no valida:', cedinvalid)
+    print(' (r4) - Total acumulado de importes finales:', imp_acu_total)
+    print(' (r5) - Cantidad de cartas simples:', ccs)
+    print(' (r6) - Cantidad de cartas certificadas:', ccc)
+    print(' (r7) - Cantidad de cartas expresas:', cce)
+    print(' (r8) - Tipo de carta con mayor cantidad de envios:', tipo_mayor)
+    print(' (r9) - Codigo postal del primer envio del archivo:', primer_cp)
+    print('(r10) - Cantidad de veces que entro ese primero:', cant_primer_cp)
+    print('(r11) - Importe menor pagado por envios a Brasil:', menimp)
+    print('(r12) - Codigo postal del envio a Brasil con importe menor:', mencp)
+    print('(r13) - Porcentaje de envios al exterior sobre el total:', porc)
+    print('(r14) - Importe final promedio de los envios Buenos Aires:', prom)
+
+if __name__ == '__main__':
+    init()
+
