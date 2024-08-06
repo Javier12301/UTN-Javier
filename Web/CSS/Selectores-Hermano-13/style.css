@@ -1,0 +1,4 @@
+/*Selectores hermano*/
+.text-2 + .title-2{
+    background-color: tomato;
+}

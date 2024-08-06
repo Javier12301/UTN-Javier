@@ -1,0 +1,74 @@
+/*
+Flexbox
+    display: flex;
+        Convierte el contenedor en un contexto para flexbox y hace que los hijos sean flex-items.
+    display:inline-flex;
+        convierte contenedor en un contexto flexbox y hace ue el contenedor sea un elemento en linea para los flex-items.
+
+    flex-direction: row(default) | row-reverse | column | column-reverse;
+        Modifica dirección y ejes de los flex-items.
+        por defecto es row. (izquierda a derecha)
+        row-reverse (derecha a izquierda)
+        column (de arriba a abajo)
+        column-reverse (de abajo a arriba)
+    
+        flox-wrap: nowrap(default) | wrap | wrap-reverse;
+           Controla si los elementos saltarán de línea o no.
+
+           nowrap: no se saltan de línea.
+
+            wrap: se saltan de línea.
+
+            wrap-reverse: se saltan de línea pero en sentido inverso.
+*/
+
+/*
+Alineamiento
+
+main-axis:
+    justify-content: flex-start(default) | flex-end | center | space-between | space-around | space-evenly;
+        Alinea los elementos a lo largo del eje principal.
+        flex-start: alinea los elementos al inicio del contenedor.
+        flex-end: alinea los elementos al final del contenedor.
+        center: alinea los elementos al centro del contenedor.
+        space-between: distribuye los elementos de manera uniforme a lo largo del contenedor.
+        space-around: distribuye los elementos de manera uniforme a lo largo del contenedor con espacio adicional al inicio y al final.
+        space-evenly: distribuye los elementos de manera uniforme a lo largo del contenedor con espacio adicional al inicio y al final y entre los elementos.
+
+cross-axis:
+    alig-items: Una sola línea
+        flex-start: alinea los elementos al inicio del contenedor.
+        flex-end: alinea los elementos al final del contenedor.
+        center: alinea los elementos al centro del contenedor.
+        baseline: alinea los elementos a la línea base del contenedor.
+        stretch: estira los elementos para que ocupen todo el alto del contenedor.
+    align-content: Varios líneas
+        flex-start: alinea los elementos al inicio del contenedor.
+        flex-end: alinea los elementos al final del contenedor.
+        center: alinea los elementos al centro del contenedor.
+        space-between: distribuye los elementos de manera uniforme a lo largo del contenedor.
+        space-around: distribuye los elementos de manera uniforme a lo largo del contenedor con espacio adicional al inicio y al final.
+        stretch: estira los elementos para que ocupen todo el alto del contenedor.
+    alig-self: Se aplica al flex-item. sirve para alinear un elemento en concreto en el cross-axis
+
+*/
+
+
+.flex-container{
+
+    background-color: burlywood;
+    height: 400px;
+    display: flex;
+    margin-bottom: 1em;
+    justify-content: center;
+}
+
+.flex-item{
+    width: 30px;
+    height: 30px;
+    margin: .5em;
+    line-height: 30px;
+    color: aliceblue;
+    text-align: center;
+    background-color: blueviolet;
+}
